@@ -3,6 +3,22 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+  active: {
+    default: true,
+    type: Boolean
+  },
+  username: {
+    max: 150,
+    required: true,
+    type: String
+  },
+  userType: {
+    type: String,
+    enum: ['Student', 'Former Student', 'Educator'],
+    default: 'Student',
+    required: true
+  },
+  // school : {type: String},
   email: { type: String, unique: true },
   password: String,
   passwordResetToken: String,

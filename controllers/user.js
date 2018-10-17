@@ -84,6 +84,7 @@ exports.postSignup = (req, res, next) => {
   req.assert('password', 'Password must be at least 4 characters long').len(4);
   req.assert('confirmPassword', 'Passwords do not match').equals(req.body.password);
   req.sanitize('email').normalizeEmail({ gmail_remove_dots: false });
+  
 
   const errors = req.validationErrors();
 
@@ -92,10 +93,13 @@ exports.postSignup = (req, res, next) => {
     return res.redirect('/signup');
   }
 
-  const user = new User({
-    email: req.body.email,
-    password: req.body.password
-  });
+  // const user = new User({
+  //   email: req.body.email,
+  //   password: req.body.password,
+  //   username: req.body.username
+  // });
+
+  const user = req.body;
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
     if (err) { return next(err); }
@@ -103,13 +107,14 @@ exports.postSignup = (req, res, next) => {
       req.flash('errors', { msg: 'Account with that email address already exists.' });
       return res.redirect('/signup');
     }
-    user.save((err) => {
+    User.create(user, (err, user) => {
       if (err) { return next(err); }
       req.logIn(user, (err) => {
         if (err) {
           return next(err);
         }
         res.redirect('/');
+        // res.status(200).send(user);
       });
     });
   });
